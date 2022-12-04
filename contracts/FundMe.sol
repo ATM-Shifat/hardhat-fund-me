@@ -25,13 +25,16 @@ contract FundMe {
     // 817827 gas = non-immutable
     // 794344 gas = immutable
 
-    constructor() {
+    AggregatorV3Interface priceFeed;
+
+    constructor(address priceFeedAdress) {
         i_owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAdress);
     }
 
     function fund() public payable {
         require(
-            msg.value.getConversionRate() >= MINIMUM_USD,
+            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
             "Didn't send enough ether"
         );
 

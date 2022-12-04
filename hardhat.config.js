@@ -28,6 +28,14 @@ module.exports = {
     etherscan: {
         apiKey: ETHERSCAN_API_KEY,
     },
+    namedAccounts: {
+        deployer: {
+            default: 0,
+        },
+        user: {
+            default: 1,
+        },
+    },
     gasReporter: {
         enabled: true,
         outputFile: "gas-report.txt",
