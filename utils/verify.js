@@ -4,7 +4,7 @@ const verify = async (contractAddress, args) => {
     console.log("Verifying contract.....")
 
     try {
-        await run("verify: veify", {
+        await run("verify: verify", {
             address: contractAddress,
             constractorArguments: args
         })
