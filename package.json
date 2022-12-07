@@ -28,5 +28,11 @@
   "dependencies": {
     "@chainlink/contracts": "^0.5.1",
     "dotenv": "^16.0.3"
+  },
+  "scripts": {
+    "test" : "yarn hardhat test",
+    "test:staging": "yarn hardhat test --network goerli",
+    "format": "yarn prettier --write",
+    "coverage": "yarn hardhat coverage"
   }
 }
