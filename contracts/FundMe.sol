@@ -7,30 +7,76 @@ pragma solidity ^0.8.7;
 
 import "./PriceConverter.sol";
 
-error NotOwner(); // custom error
+error FundMe_NotOwner(); // custom error
+
+/** @title A contract for crowd funding
+ * @author ATM_Shifat
+ * @notice This is to demo a sample funding contract
+ * @dev This implements price feeds as our library
+ */
 
 contract FundMe {
+    //Type declaration
     using PriceConverter for uint256;
 
+    //State variables
     uint256 public constant MINIMUM_USD = 5 * 1e18; // 1 * 10 ** 18
-    //transaction cost
-    //837381 gas  = non-constant
-    //817827 gas = constant
-
     address[] public funders;
     mapping(address => uint256) public addressToAmount;
     address public immutable i_owner;
+    AggregatorV3Interface public priceFeed;
 
-    //execution cost
-    // 817827 gas = non-immutable
-    // 794344 gas = immutable
+    //Modifiers
+    modifier onlyOwner() {
+        if (msg.sender != i_owner) {
+            revert FundMe_NotOwner();
+        }
+        _;
+    }
 
-    AggregatorV3Interface priceFeed;
+    //Function Order
+    //constractor
+    //receive
+    //fallback
+    //external
+    //public
+    //internal
+    //private
+    //view/pure
 
     constructor(address priceFeedAdress) {
         i_owner = msg.sender;
         priceFeed = AggregatorV3Interface(priceFeedAdress);
     }
+
+    //what happens if someone sends this contract without calling the fund function?
+    //receive , fallback
+    //Explanation on : https://solidity-by-example.org/fallback/
+    // Ether is sent to the contract
+    //         is msg.data empty?
+    //             /   \
+    //           yes    no
+    //           /         \
+    //       receive()?  fallback()
+    //        /    \
+    //     yes      not
+    //     /           \
+    // receive()    fallback()
+
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+    }
+
+    /**
+     * @notice This function funds the contract
+     * @dev Checks the amount sent to the contract.
+     * If enough money is sent , contract gets the fund else the transaction gets reverted.
+     * It uses pric feed to get the convertion rate from ETH to USD
+     */
 
     function fund() public payable {
         require(
@@ -42,8 +88,14 @@ contract FundMe {
         addressToAmount[msg.sender] = msg.value;
     }
 
+    /**
+     * @notice This function withdraws funds from the contract
+     * @dev Only the owner can call this function
+     * If enough money is sent , contract gets the fund else the transaction gets reverted.
+     * It uses pric feed to get the convertion rate from ETH to USD
+     */
+
     function withdraw() public onlyOwner {
-        //for loop
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
@@ -56,35 +108,9 @@ contract FundMe {
 
         funders = new address[](0);
 
-        //transfer
-        //send
-        //call
         (bool callSuccess, ) = payable(msg.sender).call{
             value: address(this).balance
         }("");
         require(callSuccess, "Call Failed");
-    }
-
-    modifier onlyOwner() {
-        //require(msg.sender == i_owner, "You are not the owner");
-        //794344 gas = without custom error
-        if (msg.sender != i_owner) {
-            revert NotOwner();
-        }
-        //769245 gas = with custom error
-        _;
-    }
-
-    //what happens if someone sends this contract without calling the fund function?
-
-    //receive()
-    //fallback()
-
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
     }
 }
