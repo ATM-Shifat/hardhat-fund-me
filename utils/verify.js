@@ -1,20 +1,19 @@
-const { run } = requie("hardhat")
+const { run } = require("hardhat")
 
 const verify = async (contractAddress, args) => {
     console.log("Verifying contract.....")
 
     try {
-        await run("verify: verify", {
+        await run("verify:verify", {
             address: contractAddress,
             constractorArguments: args
         })
     } catch (e) {
-        if ((e, message.toLowerCase().includes("already vaerified"))) {
-            console.log("Already vaerified")
+        if (e.message.toLowerCase().includes("already verified")) {
+            console.log("Already verified")
         } else {
             console.log(e)
         }
     }
 }
-
 module.exports = { verify }
