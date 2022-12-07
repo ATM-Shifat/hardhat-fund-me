@@ -29,7 +29,7 @@ describe("FundMe", function() {
 
     describe("constructor", function() {
         it("sets the aggreator addresses correctly", async function() {
-            const response = await fundMe.priceFeed()
+            const response = await fundMe.s_priceFeed()
             assert.equal(response, mockV3Aggregator.address)
         })
     })
@@ -43,12 +43,12 @@ describe("FundMe", function() {
         it("Updates the amount funded in the data structure", async function() {
             await fundMe.fund({ value: sendValue })
 
-            const amount = await fundMe.addressToAmount(deployer)
+            const amount = await fundMe.s_addressToAmount(deployer)
             assert.equal(amount.toString(), sendValue.toString())
         })
         it("Adds funder to the array", async function() {
             await fundMe.fund({ value: sendValue })
-            const response = await fundMe.funders(0)
+            const response = await fundMe.s_funders(0)
             assert.equal(deployer, response)
         })
     })
@@ -124,11 +124,11 @@ describe("FundMe", function() {
                 startingFundMeBalance.add(startingDeployerBalance).toString(),
                 endingDeployerBalance.add(gasCost).toString()
             )
-            //funders are reser properly
-            await expect(fundMe.funders(0)).to.be.reverted
+            //s_funders are reser properly
+            await expect(fundMe.s_funders(0)).to.be.reverted
 
             for (i = 1; i < 6; i++) {
-                assert(fundMe.addressToAmount(accounts[i]), 0)
+                assert(fundMe.s_addressToAmount(accounts[i]), 0)
             }
         })
 

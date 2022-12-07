@@ -21,10 +21,10 @@ contract FundMe {
 
     //State variables
     uint256 public constant MINIMUM_USD = 5 * 1e18; // 1 * 10 ** 18
-    address[] public funders;
-    mapping(address => uint256) public addressToAmount;
     address public immutable i_owner;
-    AggregatorV3Interface public priceFeed;
+    AggregatorV3Interface public s_priceFeed;
+    address[] public s_funders;
+    mapping(address => uint256) public s_addressToAmount;
 
     //Modifiers
     modifier onlyOwner() {
@@ -46,7 +46,7 @@ contract FundMe {
 
     constructor(address priceFeedAdress) {
         i_owner = msg.sender;
-        priceFeed = AggregatorV3Interface(priceFeedAdress);
+        s_priceFeed = AggregatorV3Interface(priceFeedAdress);
     }
 
     //what happens if someone sends this contract without calling the fund function?
@@ -80,12 +80,12 @@ contract FundMe {
 
     function fund() public payable {
         require(
-            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
+            msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
             "Didn't send enough ether"
         );
 
-        funders.push(msg.sender);
-        addressToAmount[msg.sender] = msg.value;
+        s_funders.push(msg.sender);
+        s_addressToAmount[msg.sender] = msg.value;
     }
 
     /**
@@ -96,21 +96,18 @@ contract FundMe {
      */
 
     function withdraw() public onlyOwner {
+        address[] memory funders = s_funders;
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
             funderIndex++
         ) {
-            address funder = funders[funderIndex];
-
-            addressToAmount[funder] = 0;
+            s_addressToAmount[funders[funderIndex]] = 0;
         }
 
-        funders = new address[](0);
+        s_funders = new address[](0);
 
-        (bool callSuccess, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
+        (bool callSuccess, ) = i_owner.call{value: address(this).balance}("");
         require(callSuccess, "Call Failed");
     }
 }
