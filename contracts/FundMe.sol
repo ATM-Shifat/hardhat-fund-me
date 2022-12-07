@@ -12,7 +12,7 @@ error FundMe_NotOwner(); // custom error
 /** @title A contract for crowd funding
  * @author ATM_Shifat
  * @notice This is to demo a sample funding contract
- * @dev This implements price feeds as our library
+ * @dev This implements price feeds as our library. The constructor has an address type parameter
  */
 
 contract FundMe {
