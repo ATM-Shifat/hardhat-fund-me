@@ -27,8 +27,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     } else {
         ethUsdPriceFeedAddress = networkConfig[chainId]["ehtUsdPriceFeed"]
     }
+
     const args = [ethUsdPriceFeedAddress]
-    const FundMe = await deploy("FundMe", {
+
+    const fundMe = await deploy("FundMe", {
         from: deployer,
         args: args,
         log: true,
@@ -39,7 +41,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     //     !developmentChains.includes(network.name) &&
     //     process.env.ETHERSCAN_API_KEY
     // ) {
-    //     await verify(FundMe.address, args)
+    //     await verify(fundMe.address, args)
     // }
 }
 
